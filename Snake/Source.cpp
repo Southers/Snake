@@ -166,6 +166,9 @@ int main()
 		//cin.get();
 	}
 
+	cout << endl;
+	cout << endl;
+	
 	cout << "Gameover!";
 	cout << endl;
 
