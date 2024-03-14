@@ -1,38 +1,5 @@
-#include <iostream>
-#include <conio.h>
-#include <windows.h>
-
-//define keys
-#define KEY_UP 72
-#define KEY_DOWN 80
-#define KEY_LEFT 75
-#define KEY_RIGHT 77
-
-//declarations
-using namespace std;
-bool gameOver;
-const int width = 50;
-const int height = 20;
-int x;
-int y;
-int foodX, foodY, score;
-int tailX[100], tailY[100];
-int nTail;
-int speed;
-enum eDirecton { STOP = 0, LEFT, RIGHT, UP, DOWN };
-eDirecton dir;
-
-//hide / show cursor (imported)
-void ShowConsoleCursor(bool showFlag)
-{
-	HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
-
-	CONSOLE_CURSOR_INFO     cursorInfo;
-
-	GetConsoleCursorInfo(out, &cursorInfo);
-	cursorInfo.bVisible = showFlag; // set the cursor visibility
-	SetConsoleCursorInfo(out, &cursorInfo);
-}
+#pragma once
+#include "Main.h"
 
 //setup function
 void Setup()
@@ -54,7 +21,7 @@ void Draw()
 	for (int i = 0; i < width + 2; i++)
 		cout << "x";
 	cout << endl;
-	
+
 	for (int i = 0; i < height; i++)
 	{
 		for (int j = 0; j < width; j++)
@@ -172,6 +139,7 @@ void Logic()
 		speed /= 1.2;
 	}
 }
+
 int main()
 {
 	ShowConsoleCursor(false);
