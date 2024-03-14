@@ -12,8 +12,8 @@ void Setup()
 	speed = 30;
 }
 
-//draw function
-void Draw()
+//draw visuals function
+void Visuals()
 {
 	//ClearScreen;
 	system("cls");
@@ -31,7 +31,7 @@ void Draw()
 			if (i == y && j == x)
 				cout << "O";
 			else if (i == foodY && j == foodX)
-				cout << "F";
+				cout << "%";
 			else
 			{
 				bool print = false;
@@ -61,7 +61,7 @@ void Draw()
 }
 
 //input function
-void Input()
+void PlayerInput()
 {
 	if (_kbhit())
 	{
@@ -86,8 +86,8 @@ void Input()
 	}
 }
 
-//logic function
-void Logic()
+//main gamelogic function
+void GameplayLogic()
 {
 	int prevX = tailX[0];
 	int prevY = tailY[0];
@@ -95,6 +95,7 @@ void Logic()
 	tailX[0] = x;
 	tailY[0] = y;
 
+	//loop through the number of tails
 	for (int i = 1; i < nTail; i++)
 	{
 		prev2X = tailX[i];
@@ -105,6 +106,7 @@ void Logic()
 		prevY = prev2Y;
 	}
 
+	//define direction based on input
 	switch (dir)
 	{
 	case LEFT:
@@ -130,6 +132,7 @@ void Logic()
 		if (tailX[i] == x && tailY[i] == y)
 			gameOver = true;
 
+	
 	if (x == foodX && y == foodY)
 	{
 		score += 10;
@@ -143,14 +146,21 @@ void Logic()
 int main()
 {
 	ShowConsoleCursor(false);
-	Setup();
+
+	//run once to initialise and set variables
+	Setup();			
 	
-	while (!gameOver)
+	//while loop until gameover
+	while (!gameOver)		
 	{
-		Draw();
-		Input();
-		Logic();
-		Sleep(speed); //speed of snake
+		//draws the level out on screen
+		Visuals();
+		//takes the player input and maps a direction
+		PlayerInput();
+		//sets the tail logic and replaces food
+		GameplayLogic();
+		//set the speed of snake (and everything)
+		Sleep(speed);			
 	}
 
 	cout << endl;
@@ -158,6 +168,8 @@ int main()
 	
 	cout << "Gameover!";
 	cout << endl;
+
+	system("pause");
 
 	return 0;
 }
