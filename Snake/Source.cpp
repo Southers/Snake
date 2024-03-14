@@ -18,46 +18,9 @@ int y;
 int foodX, foodY, score;
 int tailX[100], tailY[100];
 int nTail;
+int speed;
 enum eDirecton { STOP = 0, LEFT, RIGHT, UP, DOWN };
 eDirecton dir;
-
-//clearscreen function (imported)
-void ClearScreen()
-{
-	HANDLE                     hStdOut;
-	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	DWORD                      count;
-	DWORD                      cellCount;
-	COORD                      homeCoords = { 0, 0 };
-
-	hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	if (hStdOut == INVALID_HANDLE_VALUE) return;
-
-	/* Get the number of cells in the current buffer */
-	if (!GetConsoleScreenBufferInfo(hStdOut, &csbi)) return;
-	cellCount = csbi.dwSize.X * csbi.dwSize.Y;
-
-	/* Fill the entire buffer with spaces */
-	if (!FillConsoleOutputCharacter(
-		hStdOut,
-		(TCHAR)' ',
-		cellCount,
-		homeCoords,
-		&count
-	)) return;
-
-	/* Fill the entire buffer with the current colors and attributes */
-	if (!FillConsoleOutputAttribute(
-		hStdOut,
-		csbi.wAttributes,
-		cellCount,
-		homeCoords,
-		&count
-	)) return;
-
-	/* Move the cursor home */
-	SetConsoleCursorPosition(hStdOut, homeCoords);
-}
 
 //hide / show cursor (imported)
 void ShowConsoleCursor(bool showFlag)
@@ -79,12 +42,14 @@ void Setup()
 	foodX = rand() % width;
 	foodY = rand() % height;
 	score = 0;
+	speed = 30;
 }
 
 //draw function
 void Draw()
 {
-	ClearScreen();
+	//ClearScreen;
+	system("cls");
 
 	for (int i = 0; i < width + 2; i++)
 		cout << "x";
@@ -122,7 +87,7 @@ void Draw()
 	for (int i = 0; i < width + 2; i++)
 		cout << "x";
 	cout << endl;
-
+	cout << endl;
 	cout << "Score:" << score << endl;
 	cout << endl;
 	cout << "Use arrow keys to control the snake";
@@ -204,6 +169,7 @@ void Logic()
 		foodX = rand() % width;
 		foodY = rand() % height;
 		nTail++;
+		speed /= 1.2;
 	}
 }
 int main()
@@ -216,7 +182,7 @@ int main()
 		Draw();
 		Input();
 		Logic();
-		Sleep(70); //speed of snake
+		Sleep(speed); //speed of snake
 	}
 
 	cout << endl;
