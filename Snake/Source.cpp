@@ -2,59 +2,104 @@
 #include <conio.h>
 #include <windows.h>
 
+//define keys
 #define KEY_UP 72
-
 #define KEY_DOWN 80
-
 #define KEY_LEFT 75
-
 #define KEY_RIGHT 77
 
+//declarations
 using namespace std;
 bool gameOver;
 const int width = 50;
 const int height = 20;
 int x;
 int y;
-int fruitX, fruitY, score;
+int foodX, foodY, score;
 int tailX[100], tailY[100];
 int nTail;
 enum eDirecton { STOP = 0, LEFT, RIGHT, UP, DOWN };
 eDirecton dir;
 
-//void gotoxy(int x, int y)
-//{
-//	COORD coord;
-//	coord.X = x;
-//	coord.Y = y;
-//	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-//}
+//clearscreen function (imported)
+void ClearScreen()
+{
+	HANDLE                     hStdOut;
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	DWORD                      count;
+	DWORD                      cellCount;
+	COORD                      homeCoords = { 0, 0 };
 
+	hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (hStdOut == INVALID_HANDLE_VALUE) return;
+
+	/* Get the number of cells in the current buffer */
+	if (!GetConsoleScreenBufferInfo(hStdOut, &csbi)) return;
+	cellCount = csbi.dwSize.X * csbi.dwSize.Y;
+
+	/* Fill the entire buffer with spaces */
+	if (!FillConsoleOutputCharacter(
+		hStdOut,
+		(TCHAR)' ',
+		cellCount,
+		homeCoords,
+		&count
+	)) return;
+
+	/* Fill the entire buffer with the current colors and attributes */
+	if (!FillConsoleOutputAttribute(
+		hStdOut,
+		csbi.wAttributes,
+		cellCount,
+		homeCoords,
+		&count
+	)) return;
+
+	/* Move the cursor home */
+	SetConsoleCursorPosition(hStdOut, homeCoords);
+}
+
+//hide / show cursor (imported)
+void ShowConsoleCursor(bool showFlag)
+{
+	HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	CONSOLE_CURSOR_INFO     cursorInfo;
+
+	GetConsoleCursorInfo(out, &cursorInfo);
+	cursorInfo.bVisible = showFlag; // set the cursor visibility
+	SetConsoleCursorInfo(out, &cursorInfo);
+}
+
+//setup function
 void Setup()
 {
 	gameOver = false;
 	dir = STOP;
-	//gotoxy(width / 2, height / 2);
-	fruitX = rand() % width;
-	fruitY = rand() % height;
+	foodX = rand() % width;
+	foodY = rand() % height;
 	score = 0;
 }
+
+//draw function
 void Draw()
 {
-	system("cls");
+	ClearScreen();
+
 	for (int i = 0; i < width + 2; i++)
-		cout << "-";
+		cout << "x";
 	cout << endl;
+	
 	for (int i = 0; i < height; i++)
 	{
 		for (int j = 0; j < width; j++)
 		{
 			if (j == 0)
-				cout << "|";
+				cout << "x";
 			if (i == y && j == x)
 				cout << "O";
-			else if (i == fruitY && j == fruitX)
-				cout << "o";
+			else if (i == foodY && j == foodX)
+				cout << "F";
 			else
 			{
 				bool print = false;
@@ -70,17 +115,20 @@ void Draw()
 					cout << " ";
 			}
 			if (j == width - 1)
-				cout << "|";
+				cout << "x";
 		}
 		cout << endl;
 	}
 	for (int i = 0; i < width + 2; i++)
-		cout << "-";
+		cout << "x";
 	cout << endl;
+
 	cout << "Score:" << score << endl;
 	cout << endl;
 	cout << "Use arrow keys to control the snake";
 }
+
+//input function
 void Input()
 {
 	if (_kbhit())
@@ -105,14 +153,16 @@ void Input()
 		}
 	}
 }
+
+//logic function
 void Logic()
 {
-	//gotoxy(tailX[0], tailY[0]);
 	int prevX = tailX[0];
 	int prevY = tailY[0];
 	int prev2X, prev2Y;
 	tailX[0] = x;
 	tailY[0] = y;
+
 	for (int i = 1; i < nTail; i++)
 	{
 		prev2X = tailX[i];
@@ -122,6 +172,7 @@ void Logic()
 		prevX = prev2X;
 		prevY = prev2Y;
 	}
+
 	switch (dir)
 	{
 	case LEFT:
@@ -139,31 +190,33 @@ void Logic()
 	default:
 		break;
 	}
-	//if (x > width || x < 0 || y > height || y < 0) 
-	// gameOver = true; 
+
+	//if (x > width || x < 0 || y > height || y < 0) then gameOver = true; 
 	if (x >= width) x = 0; else if (x < 0) x = width - 1;
 	if (y >= height) y = 0; else if (y < 0) y = height - 1;
 	for (int i = 0; i < nTail; i++)
 		if (tailX[i] == x && tailY[i] == y)
 			gameOver = true;
-	if (x == fruitX && y == fruitY)
+
+	if (x == foodX && y == foodY)
 	{
 		score += 10;
-		fruitX = rand() % width;
-		fruitY = rand() % height;
+		foodX = rand() % width;
+		foodY = rand() % height;
 		nTail++;
 	}
 }
 int main()
 {
+	ShowConsoleCursor(false);
 	Setup();
+	
 	while (!gameOver)
 	{
 		Draw();
 		Input();
 		Logic();
 		Sleep(70); //speed of snake
-		//cin.get();
 	}
 
 	cout << endl;
